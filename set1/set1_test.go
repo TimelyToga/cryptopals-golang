@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
-	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -44,27 +43,13 @@ func TestFindMostLikelyEnglish__01_03(t *testing.T) {
 	inputBytes, err := hex.DecodeString(input)
 	assert.Nil(t, err)
 
-	var minByte byte
-	var minMsg string
-	var minScore = math.MaxFloat64
-
-	// Iterate through each byte and find most likely one
-	for i := 0; i < int(math.Pow(2, 8)); i++ {
-		curKey := byte(i)
-		decryptedMsgBytes := XorByte(inputBytes, curKey)
-		msgString := string(decryptedMsgBytes)
-
-		curScore := ScoreEnglishText(msgString)
-
-		if curScore < minScore {
-			minScore = curScore
-			minMsg = msgString
-			minByte = curKey
-		}
-	}
-
+	minMsg, minByte := FindSingleByteXOR(inputBytes)
 	fmt.Println(minMsg)
 
 	assert.Equal(t, uint8(0x58), minByte)
 	assert.Equal(t, "Cooking MC's like a pound of bacon", minMsg)
+}
+
+func FindSingleCharacterXOR(t *testing.T) {
+
 }
