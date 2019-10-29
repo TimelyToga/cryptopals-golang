@@ -94,6 +94,31 @@ func ScoreEnglishText(input string) float64 {
 	return chiSquared
 }
 
+// FindSingleByteXOR finds the most likely decrypted string by searching for
+// the byte that can be XOR'd against the input and produce the most
+// "English-like" output
+func FindSingleByteXOR(input []byte) (string, byte) {
+	var minByte byte
+	var minMsg string
+	var minScore = math.MaxFloat64
+
+	// Iterate through each byte and find most likely one
+	for i := 0; i < int(math.Pow(2, 8)); i++ {
+		curKey := byte(i)
+		decryptedMsgBytes := XorByte(input, curKey)
+		msgString := string(decryptedMsgBytes)
+
+		curScore := ScoreEnglishText(msgString)
+
+		if curScore < minScore {
+			minScore = curScore
+			minMsg = msgString
+			minByte = curKey
+		}
+	}
+	return minMsg, minByte
+}
+
 func main() {
 	fmt.Println("Just run the tests...")
 }
