@@ -1,8 +1,9 @@
-package main
+package set1
 
 import (
 	"encoding/hex"
 	"fmt"
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,13 +44,50 @@ func TestFindMostLikelyEnglish__01_03(t *testing.T) {
 	inputBytes, err := hex.DecodeString(input)
 	assert.Nil(t, err)
 
-	minMsg, minByte := FindSingleByteXOR(inputBytes)
+	minMsg, minByte, _ := FindSingleByteXOR(inputBytes)
 	fmt.Println(minMsg)
 
 	assert.Equal(t, uint8(0x58), minByte)
 	assert.Equal(t, "Cooking MC's like a pound of bacon", minMsg)
 }
 
-func FindSingleCharacterXOR(t *testing.T) {
+func TestFindSingleCharacterXOR__01_04(t *testing.T) {
+	lines, err := ReadLines("4.txt")
+	assert.Nil(t, err)
 
+	var minMsg string
+	var minScore = math.MaxFloat64
+
+	for _, line := range lines {
+		lineBytes, err := hex.DecodeString(line)
+		assert.Nil(t, err)
+
+		msg, _, score := FindSingleByteXOR(lineBytes)
+		if score < minScore {
+			minMsg = msg
+			minScore = score
+		}
+	}
+
+	fmt.Println(minMsg)
+	assert.Equal(t, "Now that the party is jumping\n", minMsg)
+}
+
+func TestRepeatingXor(t *testing.T) {
+	input := "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
+	inputBytes := []byte(input)
+
+	key := "ICE"
+	keyBytes := []byte(key)
+
+	expectedOutput := "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"
+
+	outputArray := RepeatedXor(inputBytes, keyBytes)
+
+	// Check every item in the list is equal to it's expected line string
+	assert.Equal(t, expectedOutput, hex.EncodeToString(outputArray))
+
+	// TODO: Ok. I'm close here
+	/* But I can't figure out what's going wrong. Somehow the output also has a newline in it??
+	 */
 }
