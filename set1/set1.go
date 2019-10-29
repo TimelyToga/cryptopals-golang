@@ -125,12 +125,7 @@ func FindSingleByteXOR(input []byte) (string, byte, float64) {
 func RepeatedXor(input []byte, key []byte) []byte {
 	output := make([]byte, len(input))
 	for idx, inputByte := range input {
-		// Skip newlines (ASCII 10)
-		if inputByte == 0x0A {
-			continue
-		}
-
-		curKeyByte := key[idx%(len(key)-1)]
+		curKeyByte := key[idx%(len(key))]
 		output[idx] = inputByte ^ curKeyByte
 	}
 	return output
@@ -145,4 +140,10 @@ func RepeatedXorLines(input string, key []byte) [][]byte {
 		output[idx] = RepeatedXor([]byte(line), key)
 	}
 	return output
+}
+
+// EditDistance computes the EditDistance for S1C6
+func EditDistance(first string, second string) int {
+	// Solve this in the DP way
+	return 0
 }
