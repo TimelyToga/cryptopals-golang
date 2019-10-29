@@ -4,6 +4,11 @@ If you don't know what [Cryptopals](https://cryptopals.com/) is, please check it
 
 These are my solutions implemented in golang. 
 
+### WIP
+I am currently working on this whenever I have free time. I am currently up to: 
+
+
+###### Set 1, Problem 5
 
 ## Run instructions 
 I implemented the problems as golang tests:
