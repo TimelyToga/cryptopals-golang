@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHex2Base__01_01(t *testing.T) {
+func TestHex2Base__S1_C1(t *testing.T) {
 	hexInput := "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
 	hexBytes, err := hex.DecodeString(hexInput)
 	assert.Nil(t, err)
@@ -19,7 +19,7 @@ func TestHex2Base__01_01(t *testing.T) {
 	assert.Equal(t, expectedOutput, base64Output)
 }
 
-func TestXOR__01_02(t *testing.T) {
+func TestXOR__S1_C2(t *testing.T) {
 	first := "1c0111001f010100061a024b53535009181c"
 	second := "686974207468652062756c6c277320657965"
 	expectedOutput := "746865206b696420646f6e277420706c6179"
@@ -39,7 +39,7 @@ func TestXOR__01_02(t *testing.T) {
 	assert.Equal(t, expectedOutputBytes, output)
 }
 
-func TestFindMostLikelyEnglish__01_03(t *testing.T) {
+func TestFindMostLikelyEnglish__S1_C3(t *testing.T) {
 	input := "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
 	inputBytes, err := hex.DecodeString(input)
 	assert.Nil(t, err)
@@ -51,7 +51,7 @@ func TestFindMostLikelyEnglish__01_03(t *testing.T) {
 	assert.Equal(t, "Cooking MC's like a pound of bacon", minMsg)
 }
 
-func TestFindSingleCharacterXOR__01_04(t *testing.T) {
+func TestFindSingleCharacterXOR__S1_C4(t *testing.T) {
 	lines, err := ReadLines("4.txt")
 	assert.Nil(t, err)
 
@@ -73,10 +73,9 @@ func TestFindSingleCharacterXOR__01_04(t *testing.T) {
 	assert.Equal(t, "Now that the party is jumping\n", minMsg)
 }
 
-func TestRepeatingXor(t *testing.T) {
+func TestRepeatingXor__S1_C5(t *testing.T) {
 	input := "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
 	inputBytes := []byte(input)
-	fmt.Println(inputBytes)
 
 	key := "ICE"
 	keyBytes := []byte(key)
@@ -86,8 +85,12 @@ func TestRepeatingXor(t *testing.T) {
 	outputArray := RepeatedXor(inputBytes, keyBytes)
 
 	assert.Equal(t, expectedOutput, hex.EncodeToString(outputArray))
+}
 
-	// TODO: Ok. I'm close here
-	/* But I can't figure out what's going wrong. Somehow the output also has a newline in it??
-	 */
+func TestEditDistance__S1_C6(t *testing.T) {
+	first := "this is a test"
+	second := "wokka wokka!!!"
+
+	editDistance := EditDistance(first, second)
+	assert.Equal(t, 37, editDistance)
 }

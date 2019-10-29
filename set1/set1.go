@@ -143,7 +143,36 @@ func RepeatedXorLines(input string, key []byte) [][]byte {
 }
 
 // EditDistance computes the EditDistance for S1C6
-func EditDistance(first string, second string) int {
+func EditDistance(first [], second string) int {
+	// Initialize temp array to store edit distances
+	var result = make([][]int, len(first)+1)
+	for a := range result {
+		result[a] = make([]int, len(second)+1)
+	}
+
 	// Solve this in the DP way
-	return 0
+	for xIndex, x := range result {
+		for yIndex := range x {
+			if xIndex == 0 {
+				// first is empty, fill with second
+				result[xIndex][yIndex] = len(second)
+			} else if yIndex == 0 {
+				// second is empty, fill with first
+				result[xIndex][yIndex] = len(first)
+				// Previous chars are the same, recurse
+			} else if first[xIndex-1] == second[yIndex-1] {
+				result[xIndex][yIndex] = result[xIndex-1][yIndex-1]
+			} else {
+				// Not the same, find out which is the minimum edit distance
+				result[xIndex][yIndex] = MinOf(
+					result[xIndex][yIndex-1],   // Insert
+					result[xIndex-1][yIndex],   // Remove
+					result[xIndex-1][yIndex-1], // Replace
+				)
+			}
+		}
+	}
+
+	// Return the final edit distance
+	return result[len(first)][len(second)]
 }
