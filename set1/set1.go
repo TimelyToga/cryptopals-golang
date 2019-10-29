@@ -1,9 +1,8 @@
-package main
+package set1
 
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"math"
 	"strings"
 )
@@ -97,7 +96,8 @@ func ScoreEnglishText(input string) float64 {
 // FindSingleByteXOR finds the most likely decrypted string by searching for
 // the byte that can be XOR'd against the input and produce the most
 // "English-like" output
-func FindSingleByteXOR(input []byte) (string, byte) {
+// OUTPUT => (decryptedString, key, score)
+func FindSingleByteXOR(input []byte) (string, byte, float64) {
 	var minByte byte
 	var minMsg string
 	var minScore = math.MaxFloat64
@@ -116,9 +116,33 @@ func FindSingleByteXOR(input []byte) (string, byte) {
 			minByte = curKey
 		}
 	}
-	return minMsg, minByte
+
+	return minMsg, minByte, minScore
 }
 
-func main() {
-	fmt.Println("Just run the tests...")
+// RepeatedXor first came up in S1P5 and iterates over input,
+// XORing with a cycle of bytes from the key
+func RepeatedXor(input []byte, key []byte) []byte {
+	output := make([]byte, len(input))
+	for idx, inputByte := range input {
+		// Skip newlines (ASCII 10)
+		if inputByte == 0x0A {
+			continue
+		}
+
+		curKeyByte := key[idx%(len(key)-1)]
+		output[idx] = inputByte ^ curKeyByte
+	}
+	return output
+}
+
+// RepeatedXorLines Split input string on newlines, then apply RepeatedXOR over each line
+func RepeatedXorLines(input string, key []byte) [][]byte {
+	lines := strings.Split(input, "\n")
+	output := make([][]byte, len(lines))
+
+	for idx, line := range lines {
+		output[idx] = RepeatedXor([]byte(line), key)
+	}
+	return output
 }
