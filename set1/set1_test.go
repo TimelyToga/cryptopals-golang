@@ -76,6 +76,7 @@ func TestFindSingleCharacterXOR__01_04(t *testing.T) {
 func TestRepeatingXor(t *testing.T) {
 	input := "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
 	inputBytes := []byte(input)
+	fmt.Println(inputBytes)
 
 	key := "ICE"
 	keyBytes := []byte(key)
@@ -84,7 +85,6 @@ func TestRepeatingXor(t *testing.T) {
 
 	outputArray := RepeatedXor(inputBytes, keyBytes)
 
-	// Check every item in the list is equal to it's expected line string
 	assert.Equal(t, expectedOutput, hex.EncodeToString(outputArray))
 
 	// TODO: Ok. I'm close here
