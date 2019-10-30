@@ -96,11 +96,22 @@ func TestEditDistance__S1_C6(t *testing.T) {
 }
 
 func TestBreakRepeatingKeyXor__S1_C6b(t *testing.T) {
-	fileBytes, err := ReadLineBytes("6.txt")
+	fileBytes, err := ReadFileBytes("6.txt")
 	assert.Nil(t, err)
 
 	outputText, key := BreakRepeatingKeyXor(fileBytes)
 	fmt.Printf("BROKEN KEY: %s\n", key)
 	fmt.Println("FINAL OUTPUT STRING:")
 	fmt.Println(outputText)
+}
+
+func TestDecryptAES128InECB__S1_C7(t *testing.T) {
+	fileBytes, err := ReadFileBytes("7.txt")
+	assert.Nil(t, err)
+
+	keyBytes := []byte("YELLOW SUBMARINE")
+
+	outputBytes := DecryptAES128InECB(fileBytes, keyBytes)
+
+	fmt.Println(string(outputBytes))
 }

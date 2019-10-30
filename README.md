@@ -14,5 +14,5 @@ I am currently working on this whenever I have free time. I am currently up to:
 I implemented the problems as golang tests:
 
 ```
-go test -v
+go test -v ./...
 ```
