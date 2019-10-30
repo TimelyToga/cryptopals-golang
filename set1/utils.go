@@ -32,9 +32,8 @@ func ReadLines(relFilePath string) ([]string, error) {
 	return output, nil
 }
 
-// ReadLineBytes reads the lines from a file, then concatenates
-// all the bytes into a single array that it returns
-func ReadLineBytes(relFilePath string) ([]byte, error) {
+// ReadFileBytes reads a file and returns it as a byte array
+func ReadFileBytes(relFilePath string) ([]byte, error) {
 	absPath, err := filepath.Abs(relFilePath)
 	if err != nil {
 		return nil, err
@@ -49,8 +48,7 @@ func ReadLineBytes(relFilePath string) ([]byte, error) {
 	fileBytes, err := ioutil.ReadAll(file)
 
 	// Base64 decode input
-	decodedBytes := make([]byte, len(fileBytes))
-	_, err = base64.StdEncoding.Decode(decodedBytes, fileBytes)
+	decodedBytes, err := base64.StdEncoding.DecodeString(string(fileBytes))
 	if err != nil {
 		return nil, err
 	}
