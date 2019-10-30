@@ -2,13 +2,15 @@ package set1
 
 import (
 	"bufio"
+	"encoding/base64"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
 // ReadLines returns a []string of the lines in a file
 func ReadLines(relFilePath string) ([]string, error) {
-	absPath, err := filepath.Abs("4.txt")
+	absPath, err := filepath.Abs(relFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -28,6 +30,32 @@ func ReadLines(relFilePath string) ([]string, error) {
 	}
 
 	return output, nil
+}
+
+// ReadLineBytes reads the lines from a file, then concatenates
+// all the bytes into a single array that it returns
+func ReadLineBytes(relFilePath string) ([]byte, error) {
+	absPath, err := filepath.Abs(relFilePath)
+	if err != nil {
+		return nil, err
+	}
+	file, err := os.Open(absPath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// Read the file in
+	fileBytes, err := ioutil.ReadAll(file)
+
+	// Base64 decode input
+	decodedBytes := make([]byte, len(fileBytes))
+	_, err = base64.StdEncoding.Decode(decodedBytes, fileBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return decodedBytes, nil
 }
 
 // MinOf is an int min helper function
