@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -91,6 +92,109 @@ func TestEditDistance__S1_C6(t *testing.T) {
 	first := "this is a test"
 	second := "wokka wokka!!!"
 
-	editDistance := EditDistance(first, second)
+	editDistance := HammingDistance([]byte(first), []byte(second))
 	assert.Equal(t, 37, editDistance)
+}
+
+// KeyCandidate is a temp data struct for wrapping the keysize and HammingDistance together
+type KeyCandidate struct {
+	KeySize         int
+	HammingDistance float64
+}
+
+func FindKeySize(fileBytes []byte) []int {
+	// var minKeySize int
+	// var minHD = math.MaxFloat64
+
+	var results []KeyCandidate
+	for keySize := 2; keySize <= 40; keySize++ {
+		// firstKS := fileBytes[0:keySize]
+		// secondKS := fileBytes[keySize : 2*keySize]
+		// finalHD := float64(HammingDistance(firstKS, secondKS)) / float64(keySize)
+
+		// Iterate over combinations of first 4 blocks to find a better approximation for avg HD
+		var totalHD float64
+		var iterations = 0
+		for x := 0; x < 4; x++ {
+			for y := x; y < 4; y++ {
+				if x == y {
+					continue
+				}
+
+				firstKS := fileBytes[x*keySize : (x+1)*keySize]
+				secondKS := fileBytes[y*keySize : (y+1)*keySize]
+				totalHD += float64(HammingDistance(firstKS, secondKS))
+				iterations++
+			}
+		}
+		finalHD := totalHD / (float64(keySize) * float64(iterations))
+
+		// fmt.Printf("KS: %d\tHD: %f\n", keySize, finalHD)
+		results = append(results, KeyCandidate{KeySize: keySize, HammingDistance: finalHD})
+	}
+
+	// Sort by keySize
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].HammingDistance < results[j].HammingDistance
+	})
+
+	// Output top min k keysizes by hamming distance
+	var outputKeySizes = make([]int, 3)
+	for a := 0; a < len(outputKeySizes); a++ {
+		outputKeySizes[a] = results[a].KeySize
+		fmt.Printf("The minimum KS is %d and the HD is %f\n", results[a].KeySize, results[a].HammingDistance)
+	}
+
+	return outputKeySizes
+}
+
+func TestBreakRepeatingKeyXor__S1_C6b(t *testing.T) {
+	fileBytes, err := ReadLineBytes("6.txt")
+	t.Log(err)
+	assert.Nil(t, err)
+
+	// Convert from base64
+
+	// Search for the keysize in [2, 40]
+	keySizeCandidates := FindKeySize(fileBytes)
+
+	// Iterate over the possible keysizes, and find the most reasonable one
+	var maxScore = math.MaxFloat64
+	var bestText string
+	for _, minKeySize := range keySizeCandidates {
+		// Step 5: Make transposed KEYSIZE blocks of KEYSIZE length
+		// init 2D array
+		numBlocks := len(fileBytes) / minKeySize
+		transposedBlocks := make([][]byte, minKeySize)
+		for idx := range transposedBlocks {
+			transposedBlocks[idx] = make([]byte, numBlocks)
+		}
+
+		// Traspose the blocks
+		for y := 0; y < minKeySize; y++ {
+			for x := 0; x < numBlocks; x++ {
+				transposedBlocks[y][x] = fileBytes[x*minKeySize+y]
+			}
+		}
+
+		// Now find XOR byte for each block
+		var keyBytes = make([]byte, minKeySize)
+		for idx := range keyBytes {
+			_, curKeyByte, _ := FindSingleByteXOR(transposedBlocks[idx])
+			keyBytes[idx] = curKeyByte
+		}
+
+		fmt.Println(string(keyBytes))
+
+		// Decrypt the message
+		output := string(RepeatedXor(fileBytes, keyBytes))
+		curTextScore := ScoreEnglishText(output)
+		if curTextScore < maxScore {
+			maxScore = curTextScore
+			bestText = output
+		}
+	}
+
+	fmt.Println("FINAL OUTPUT STRING:")
+	fmt.Println(bestText)
 }

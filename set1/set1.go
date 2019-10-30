@@ -143,7 +143,7 @@ func RepeatedXorLines(input string, key []byte) [][]byte {
 }
 
 // EditDistance computes the EditDistance for S1C6
-func EditDistance(first [], second string) int {
+func EditDistance(first string, second string) int {
 	// Initialize temp array to store edit distances
 	var result = make([][]int, len(first)+1)
 	for a := range result {
@@ -175,4 +175,19 @@ func EditDistance(first [], second string) int {
 
 	// Return the final edit distance
 	return result[len(first)][len(second)]
+}
+
+// HammingDistance counts the number of differ bits between
+// first and second only if they are the same length
+func HammingDistance(first []byte, second []byte) int {
+	var count int
+	for idx := range first {
+		xor := first[idx] ^ second[idx]
+		// Count set bits
+		for xor != 0 {
+			count += int(xor & 1)
+			xor >>= 1
+		}
+	}
+	return count
 }
