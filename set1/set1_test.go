@@ -115,3 +115,25 @@ func TestDecryptAES128InECB__S1_C7(t *testing.T) {
 
 	fmt.Println(string(outputBytes))
 }
+
+func TestDetectAE128InECB__S1_C8(t *testing.T) {
+	lines, err := ReadLines("8.txt")
+	assert.Nil(t, err)
+
+	var maxBytes []byte
+	var maxCount int
+	for _, line := range lines {
+		// Decode hex string
+		lineBytes, err := hex.DecodeString(line)
+		assert.Nil(t, err)
+
+		counter := DetectAES128InECB(lineBytes)
+		if counter > maxCount {
+			maxCount = counter
+			maxBytes = lineBytes
+		}
+	}
+
+	fmt.Printf("Count: %d\n", maxCount)
+	fmt.Println(hex.EncodeToString(maxBytes))
+}
